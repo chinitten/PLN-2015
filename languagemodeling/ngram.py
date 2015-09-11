@@ -1,5 +1,5 @@
 # https://docs.python.org/3/library/collections.html
-from collections import defaultdict
+from collections import defaultdict , Counter
 from math import log2
 
 class NGram(object):
@@ -88,3 +88,49 @@ class NGram(object):
             result += log2(aux)
 
         return result
+
+class AddOneNGram(NGram):
+
+    def __init__(self, n, sents):
+        """
+        n -- order of the model.
+        sents -- list of sentences, each one being a list of tokens.
+        """
+        super(AddOneNGram, self).__init__(n,sents)
+        d = set()
+        for sent in sents:
+            sent = (n-1)*['<s>'] + sent
+            sent.append('</s>')
+            aux = set(sent)
+            d = d.union(aux)
+
+        if n == 1:
+            self.v = len(d)
+        else:
+            self.v = len(d)-1
+
+    def count(self, tokens):
+        """Count for an n-gram or (n-1)-gram.
+
+        tokens -- the n-gram or (n-1)-gram tuple.
+        """
+        return self.counts[tuple(tokens)]
+
+    def cond_prob(self, token, prev_tokens=None):
+        """Conditional probability of a token.
+
+        token -- the token.
+        prev_tokens -- the previous n-1 tokens (optional only if n = 1).
+        """
+
+        if not prev_tokens:
+            prev_tokens = []
+
+        tokens = prev_tokens + [token]
+
+        return float(self.count(tokens)+1)/(self.count(prev_tokens) + self.v)
+
+    def V(self):
+        """Size of the vocabulary.
+        """
+        return self.v
