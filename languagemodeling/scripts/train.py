@@ -15,10 +15,10 @@ Options:
 from docopt import docopt
 import pickle
 
-from nltk.corpus import PlaintextCorpusReader #gutenberg
+from nltk.corpus import PlaintextCorpusReader  # gutenberg
 from nltk.tokenize import RegexpTokenizer
 
-from languagemodeling.ngram import NGram , AddOneNGram
+from languagemodeling.ngram import NGram, AddOneNGram
 
 
 if __name__ == '__main__':
@@ -36,9 +36,9 @@ if __name__ == '__main__':
     tokenizer = RegexpTokenizer(pattern)
 
     # load the data
-    #sents = gutenberg.sents('corpus.txt')
-    sents = PlaintextCorpusReader('../','corpus.txt', word_tokenizer=tokenizer).sents()
-    sents = sents[:int(0.9*len(sents))] #Take the first 90%
+    # sents = gutenberg.sents('corpus.txt')
+    sents = PlaintextCorpusReader('../', 'corpus.txt', word_tokenizer=tokenizer).sents()
+    sents = sents[:int(0.9*len(sents))]  # Take the first 90%
 
     # choose & train the model
     n = int(opts['-n'])

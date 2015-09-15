@@ -11,7 +11,7 @@ Options:
 
 from docopt import docopt
 import pickle
-from math import log2 , ceil
+from math import ceil
 
 from nltk.corpus import PlaintextCorpusReader
 from nltk.tokenize import RegexpTokenizer
@@ -35,8 +35,8 @@ if __name__ == '__main__':
 
     tokenizer = RegexpTokenizer(pattern)
 
-    sents = PlaintextCorpusReader('../','corpus.txt', word_tokenizer=tokenizer).sents()
-    sents = sents[-ceil(0.1*len(sents)):] #Take the last 10%
+    sents = PlaintextCorpusReader('../', 'corpus.txt', word_tokenizer=tokenizer).sents()
+    sents = sents[-ceil(0.1*len(sents)):]  # Take the last 10%
 
     log_prob = 0.
     m = 0
@@ -44,5 +44,5 @@ if __name__ == '__main__':
         log_prob += model.sent_log_prob(sent)
         m += len(sent)
     l = log_prob/m
-    perplexity = pow(2,-l)
+    perplexity = pow(2, -l)
     print(perplexity)
