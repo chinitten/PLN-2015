@@ -1,11 +1,14 @@
 """Train an n-gram model.
 
 Usage:
-  train.py -n <n> -o <file>
+  train.py -n <n> [-m <model>] -o <file>
   train.py -h | --help
 
 Options:
   -n <n>        Order of the model.
+  -m <model>    Model to use [default: ngram]:
+                  ngram: Unsmoothed n-grams.
+                  addone: N-grams with add-one smoothing.
   -o <file>     Output model file.
   -h --help     Show this screen.
 """
@@ -15,7 +18,7 @@ import pickle
 from nltk.corpus import PlaintextCorpusReader #gutenberg
 from nltk.tokenize import RegexpTokenizer
 
-from languagemodeling.ngram import NGram
+from languagemodeling.ngram import NGram , AddOneNGram
 
 
 if __name__ == '__main__':
@@ -27,7 +30,7 @@ if __name__ == '__main__':
     | \w+(-\w+)*        # words with optional internal hyphens
     | \$?\d+(\.\d+)?%?  # currency and percentages, e.g. $12.40, 82%
     | \.\.\.            # ellipsis
-    | [][.,;"'?():-_`]  # these are separate tokens; includes ], [
+    | [][.,;"'?():-_`]  # these are separate tokens; includes ],
     '''
 
     tokenizer = RegexpTokenizer(pattern)
@@ -35,12 +38,15 @@ if __name__ == '__main__':
     # load the data
     #sents = gutenberg.sents('corpus.txt')
     sents = PlaintextCorpusReader('../','corpus.txt', word_tokenizer=tokenizer).sents()
+    sents = sents[:int(0.9*len(sents))] #Take the first 90%
 
-    print(sents[0])
-
-    # train the model
+    # choose & train the model
     n = int(opts['-n'])
-    model = NGram(n, sents)
+    m = opts['-m']
+    if m == 'addone':
+        model = AddOneNGram(n, sents)
+    elif m == 'ngram':
+        model = NGram(n, sents)
 
     # save it
     filename = opts['-o']

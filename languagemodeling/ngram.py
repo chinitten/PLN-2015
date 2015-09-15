@@ -1,6 +1,6 @@
 # https://docs.python.org/3/library/collections.html
 from collections import defaultdict , Counter
-from math import log2
+from math import log2 , ceil
 
 class NGram(object):
 
@@ -50,7 +50,10 @@ class NGram(object):
         #print(n)
         assert len(prev_tokens) == n - 1
 
-        return float(self.counts[tuple(prev_tokens + [token])]) / self.counts[tuple(prev_tokens)]
+        if self.counts[tuple(prev_tokens)] == 0:
+            return 0.
+        else:
+            return float(self.counts[tuple(prev_tokens + [token])]) / self.counts[tuple(prev_tokens)]
 
 
     def sent_prob(self, sent):
@@ -88,6 +91,32 @@ class NGram(object):
             result += log2(aux)
 
         return result
+
+class NGramGenerator(object):
+
+    def __init__(self, model):
+        """
+        model -- n-gram model.
+        """
+        self.probs = probs = defaultdict(lambda : defaultdict(float))
+        total = 0.
+        if model.n == 1:
+            for key in model.counts.keys():
+                probs.update({key[0] : model.cond_prob(key[0],list(key[:-1]))})
+        else:
+            for key in model.counts.keys():
+                probs.update({key[0] : model.cond_prob(key[0],list(key[:-1]))})
+
+        #print(self.probs)
+
+    def generate_sent(self):
+        """Randomly generate a sentence."""
+
+    def generate_token(self, prev_tokens=None):
+        """Randomly generate a token, given prev_tokens.
+
+        prev_tokens -- the previous n-1 tokens (optional only if n = 1).
+        """
 
 class AddOneNGram(NGram):
 
@@ -134,3 +163,65 @@ class AddOneNGram(NGram):
         """Size of the vocabulary.
         """
         return self.v
+
+class InterpolatedNGram(NGram):
+
+    def __init__(self, n, sents, gamma=None, addone=True):
+        """
+        n -- order of the model.
+        sents -- list of sentences, each one being a list of tokens.
+        gamma -- interpolation hyper-parameter (if not given, estimate using
+            held-out data).
+        addone -- whether to use addone smoothing (default: True).
+        """
+        super(InterpolatedNGram, self).__init__(n,sents)
+
+        if not gamma:
+            held_out = sents[-ceil(0.1*len(sents)):] #Take the last 10%
+            sents = sents[:int(0.9*len(sents))] #Take the first 90%
+
+        self.gamma = gamma
+        self.models = models = list()
+        if addone:
+            for i in range(0,n):
+                models.append(AddOneNGram(i+1,sents))
+        else:
+            for i in range(0,n):
+                models.append(NGram(i+1,sents))
+
+
+    def cond_prob(self, token, prev_tokens=None):
+        """Conditional probability of a token.
+
+        token -- the token.
+        prev_tokens -- the previous n-1 tokens (optional only if n = 1).
+        """
+        n = self.n
+        models = self.models
+        gamma = self.gamma
+        if not prev_tokens:
+            prev_tokens = []
+        lambdas = list()
+        aux = 0.
+        prob = 0.
+        for i in range(0,n-1):
+            lambdas.append((1-aux)*models[n-(i+1)].count(prev_tokens)
+                                    /(models[n-(i+1)].count(prev_tokens)+gamma))
+            prob += lambdas[i]*models[n-(i+1)].cond_prob(token,prev_tokens)
+            aux = sum(lambdas)
+            prev_tokens = prev_tokens[1:]
+        lambdas.append(1-aux)
+        prob += lambdas[n-1]*models[0].cond_prob(token,prev_tokens)
+
+        return prob
+
+    def count(self, tokens):
+        """Count for an n-gram or (n-1)-gram.
+
+        tokens -- the n-gram or (n-1)-gram tuple.
+        """
+        models = self.models
+        index = len(tokens)
+        if index == 0:
+            index = 1
+        return models[index-1].count(tokens)
