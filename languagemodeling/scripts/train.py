@@ -1,7 +1,7 @@
 """Train an n-gram model.
 
 Usage:
-  train.py -n <n> [-m <model>] -o <file>
+  train.py -n <n> [-m <model>] [--addone] [--gamma <g>] -o <file>
   train.py -h | --help
 
 Options:
@@ -9,6 +9,9 @@ Options:
   -m <model>    Model to use [default: ngram]:
                   ngram: Unsmoothed n-grams.
                   addone: N-grams with add-one smoothing.
+                  interpol: Interpolated
+  --addone      Set addone for interpolated ngram [default: False]
+  --gamma <g>   Set gamma for interpolated ngram [default: None]
   -o <file>     Output model file.
   -h --help     Show this screen.
 """
@@ -18,7 +21,7 @@ import pickle
 from nltk.corpus import PlaintextCorpusReader  # gutenberg
 from nltk.tokenize import RegexpTokenizer
 
-from languagemodeling.ngram import NGram, AddOneNGram
+from languagemodeling.ngram import NGram, AddOneNGram, InterpolatedNGram
 
 
 if __name__ == '__main__':
@@ -43,10 +46,17 @@ if __name__ == '__main__':
     # choose & train the model
     n = int(opts['-n'])
     m = opts['-m']
+    a = opts['--addone']
+    g = opts['--gamma']
+
     if m == 'addone':
         model = AddOneNGram(n, sents)
     elif m == 'ngram':
         model = NGram(n, sents)
+    elif m == 'interpol':
+        if g==None:
+            g = float(g)
+        model = InterpolatedNGram(n, sents, a, g)
 
     # save it
     filename = opts['-o']
