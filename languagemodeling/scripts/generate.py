@@ -22,7 +22,6 @@ if __name__ == '__main__':
     f = open(filename, 'rb')
     model = pickle.load(f)
 
-
     n = int(opts['-n'])
 
     generator = NGramGenerator(model)

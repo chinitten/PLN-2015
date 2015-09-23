@@ -54,7 +54,7 @@ if __name__ == '__main__':
     elif m == 'ngram':
         model = NGram(n, sents)
     elif m == 'interpol':
-        if g==None:
+        if g is None:
             g = float(g)
         model = InterpolatedNGram(n, sents, a, g)
 
