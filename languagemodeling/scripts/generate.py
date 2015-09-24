@@ -26,6 +26,6 @@ if __name__ == '__main__':
 
     generator = NGramGenerator(model)
     sents = list()
-    for i in range(0,n):
+    for i in range(0, n):
         sents.append(generator.generate_sent())
     print(sents)

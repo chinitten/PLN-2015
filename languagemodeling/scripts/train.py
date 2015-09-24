@@ -1,7 +1,7 @@
 """Train an n-gram model.
 
 Usage:
-  train.py -n <n> [-m <model>] [--addone] [--gamma <g>] -o <file>
+  train.py -n <n> [-m <model>] [--addone] [--gamma <g>] [--beta <b>] -o <file>
   train.py -h | --help
 
 Options:
@@ -10,8 +10,10 @@ Options:
                   ngram: Unsmoothed n-grams.
                   addone: N-grams with add-one smoothing.
                   interpol: Interpolated
+                  backoff: Back-Off
   --addone      Set addone for interpolated ngram [default: False]
   --gamma <g>   Set gamma for interpolated ngram [default: None]
+  --beta <b>    Set beta for Back-Off ngram [default: None]
   -o <file>     Output model file.
   -h --help     Show this screen.
 """
@@ -21,7 +23,7 @@ import pickle
 from nltk.corpus import PlaintextCorpusReader  # gutenberg
 from nltk.tokenize import RegexpTokenizer
 
-from languagemodeling.ngram import NGram, AddOneNGram, InterpolatedNGram
+from languagemodeling.ngram import NGram, AddOneNGram, InterpolatedNGram, BackOffNGram
 
 
 if __name__ == '__main__':
@@ -48,15 +50,20 @@ if __name__ == '__main__':
     m = opts['-m']
     a = opts['--addone']
     g = opts['--gamma']
+    b = opts['--beta']
 
     if m == 'addone':
         model = AddOneNGram(n, sents)
     elif m == 'ngram':
         model = NGram(n, sents)
     elif m == 'interpol':
-        if g is None:
+        if g is not None:
             g = float(g)
         model = InterpolatedNGram(n, sents, a, g)
+    elif m == 'backoff':
+        if b is not None:
+            b = float(b)
+        model = BackOffNGram(n, sents, b, a)
 
     # save it
     filename = opts['-o']

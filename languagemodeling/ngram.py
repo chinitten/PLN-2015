@@ -24,6 +24,9 @@ class NGram(object):
                 counts[ngram[:-1]] += 1
 
     def log_prob(self, sents):
+        """
+        Log probability calculation.
+        """
         result = 0.
         for sent in sents:
             aux = self.sent_log_prob(sent)
@@ -33,6 +36,9 @@ class NGram(object):
         return result
 
     def cross_entropy(self, sents):
+        """
+        Cross entropy calculation
+        """
         m = 0.
         log_prob = self.log_prob(sents)
         if log_prob == -float('inf'):
@@ -42,6 +48,9 @@ class NGram(object):
         return log_prob/m
 
     def perplexity(self, sents):
+        """
+        Perplexity calculation
+        """
         cross = self.cross_entropy(sents)
         return pow(2, -cross)
 
@@ -135,7 +144,6 @@ class NGramGenerator(object):
         for item in probs.items():
             sorted_probs[item[0]] = sorted(item[1].items(), key=lambda x: (x[1], x[0]), reverse=False)
 
-
     def generate_sent(self):
         """Randomly generate a sentence."""
 
@@ -158,8 +166,6 @@ class NGramGenerator(object):
                 break
 
         return sentence
-
-
 
     def generate_token(self, prev_tokens=None):
         """Randomly generate a token, given prev_tokens.
@@ -243,7 +249,7 @@ class InterpolatedNGram(NGram):
         """
         super(InterpolatedNGram, self).__init__(n, sents)
 
-        if not gamma:
+        if gamma is None:
             held_out = sents[-ceil(0.1*len(sents)):]  # Take the last 10%
             sents = sents[:int(0.9*len(sents))]  # Take the first 90%
             self.estimate_gamma(n, sents, held_out, addone)
@@ -259,8 +265,10 @@ class InterpolatedNGram(NGram):
             models.append(NGram(i+1, sents))
 
     def estimate_gamma(self, n, sents, held_out, addone):
-
-        gammas = [n*100 for n in range(1, 20)]
+        """
+        Estimates gamma with minimun perplexity from a determined range
+        """
+        gammas = [i*100 for i in range(1, 20)]
         aux = 0.
         aux_ngram = None
         candidates = list()
@@ -327,11 +335,12 @@ class BackOffNGram(NGram):
         self.betacounts = betacounts = list()
         self.alphadict = defaultdict(float)
         self.denomdict = defaultdict(float)
+        self.Adict = defaultdict(set)
         self.n = n
 
         if beta is None:
             sents = sents[:int(0.9*len(sents))]  # Take the first 90%
-            held_out = sents[-ceil(0.1*len(sents)):] # Take the last 10%
+            held_out = sents[-ceil(0.1*len(sents)):]  # Take the last 10%
 
         if addone:
             d = set()
@@ -346,7 +355,7 @@ class BackOffNGram(NGram):
             else:
                 self.v = len(d)-1
 
-        for j in range(0,n+1):
+        for j in range(0, n+1):
             counts.append(defaultdict(int))
             betacounts.append(defaultdict(float))
 
@@ -355,69 +364,82 @@ class BackOffNGram(NGram):
             sent.append('</s>')
             for i in range(len(sent) - n + 1):
                 ngram = tuple(sent[i: i + n])
-                for j in range(0,n+1):
+                for j in range(0, n+1):
                     counts[j][ngram[j:]] += 1
 
-        for j in range(1,n):
+        for j in range(1, n):
             start = ('<s>',)*j
             counts[n-j][start] = (n-j)*len(sents)
 
         if beta is None:
-            self.beta = beta = self.estimate_beta(n, held_out)
-            for j in range(0,n+1):
-                for key , value in counts[j].items():
+            self.estimate_beta(n, held_out)
+            beta = self.beta
+            for j in range(0, n+1):
+                for key, value in counts[j].items():
                     self.betacounts[j][key] = value - beta
         else:
-            for j in range(0,n+1):
-                for key , value in counts[j].items():
+            for j in range(0, n+1):
+                for key, value in counts[j].items():
                     self.betacounts[j][key] = value - beta
 
+        self.create_A()
         self.create_alphadict()
         self.create_denomdict()
 
     def estimate_beta(self, n, held_out):
-
+        """
+        Estimates beta with minimun perplexity from a determined range
+        """
         candidates = list()
-        betacounts = list()
-        perpl = 0.
         counts = self.counts
         self.betacounts = list()
         for beta in [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]:
-            for j in range(0,n+1):
+            # Por cada beta se calcula un betacount.
+            for j in range(0, n+1):
                 self.betacounts.append(defaultdict(float))
-                for key , value in counts[j].items():
+                for key, value in counts[j].items():
                     self.betacounts[j][key] = value - beta
             self.beta = beta
+            # Por cada beta,betacount se calculan alphas, denoms y As.
+            self.create_A()
             self.create_alphadict()
             self.create_denomdict()
 
+            # Valiendose de lo calculado anteriormente se calcula perplexity.
             perplexity = self.perplexity(held_out)
             candidates.append((perplexity, beta))
 
+            # Limpio para la próxima iteración.
             self.beta = None
+            self.Adict = defaultdict(set)
             self.alphadict = defaultdict(float)
             self.denomdict = defaultdict(float)
             self.betacounts = list()
 
-        for j in range(0,n+1):
+        # Restauro el betacounts al valor inicial
+        for j in range(0, n+1):
             self.betacounts.append(defaultdict(float))
 
-        beta = min(candidates)[1]
-
-        return beta
+        self.beta = min(candidates)[1]
 
     def create_alphadict(self):
-
+        """
+        Creates alpha dictionary
+        """
+        print('ENTRO ALPHA_DICT')
         alphadict = self.alphadict
         counts = self.counts
         beta = self.beta
         n = self.n
-        for j in range(0,n+1):
+        for j in range(0, n+1):
             for key in counts[j].keys():
                 alphadict[key] = beta*len(self.A(key))/self.counts[j][key]
 
     def create_denomdict(self):
-
+        """
+        Creates denom dictionary
+        """
+        print('ENTRO DENOM_DICT')
         addone = self.addone
         counts = self.counts
         denomdict = self.denomdict
@@ -431,9 +453,21 @@ class BackOffNGram(NGram):
             for key in counts[n-1].keys():
                     denomdict[key] = 1.0 - sum(counts[n-1][(w,)]/counts[n][()] for w in self.A(key))
 
-        for index in range(1,n):
+        for index in range(1, n):
             for key in counts[n - (index+1)].keys():
                     denomdict[key] = 1.0 - sum(self.cond_prob(w, list(key[1:])) for w in self.A(key))
+
+    def create_A(self):
+        """
+        Creates A dictionary
+        """
+        n = self.n
+        for j in range(0, n+1):
+            for key, value in self.counts[j].items():
+                if (value > 0):
+                    try: self.Adict[key[:-1]].add(key[-1:][0])
+                    except IndexError:
+                        continue
 
     def count(self, tokens):
         """Count for an n-gram or (n-1)-gram.
@@ -449,19 +483,7 @@ class BackOffNGram(NGram):
 
         tokens -- the k-gram tuple.
         """
-        a = set()
-
-        index = len(tokens)
-        if index == 0:
-            return a
-
-        n = self.n
-
-        for key in self.counts[n-(index+1)].keys():
-            if key[:-1] == tokens:
-                a.add(key[-1:][0])
-
-        return a
+        return self.Adict.get(tokens, set())
 
     def alpha(self, tokens):
         """Missing probability mass for a k-gram with 0 < k < n.
@@ -470,7 +492,6 @@ class BackOffNGram(NGram):
         """
 
         return self.alphadict.get(tokens, 1.0)
-
 
     def denom(self, tokens):
         """Normalization factor for a k-gram with 0 < k < n.
@@ -503,11 +524,11 @@ class BackOffNGram(NGram):
                 result = float(counts[n-1][tuple([token])]) / counts[n][()]
         else:
             if counts[n-index][tokens] > 0:
-                result = float(betacounts[n-index][tokens])/ float(counts[n-index+1][tuple(prev_tokens)])
+                result = float(betacounts[n-index][tokens]) / float(counts[n-index+1][tuple(prev_tokens)])
             else:
                 if self.alpha(tuple(prev_tokens)) == 0:
                     result = 0.
                 else:
-                    result = self.alpha(tuple(prev_tokens))* (self.cond_prob(token,prev_tokens[1:])/self.denom(tuple(prev_tokens)))
+                    result = self.alpha(tuple(prev_tokens)) * (self.cond_prob(token, prev_tokens[1:]) / self.denom(tuple(prev_tokens)))
 
         return result
