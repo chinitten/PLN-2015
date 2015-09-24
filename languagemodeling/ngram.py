@@ -268,7 +268,9 @@ class InterpolatedNGram(NGram):
         """
         Estimates gamma with minimun perplexity from a determined range
         """
-        gammas = [i*100 for i in range(1, 20)]
+        print("Entering estimate_gamma")
+        gammas = [i*10 for i in range(1, 11)]
+        print(gammas)
         aux = 0.
         aux_ngram = None
         candidates = list()
@@ -276,7 +278,7 @@ class InterpolatedNGram(NGram):
             aux_ngram = InterpolatedNGram(n, sents, gamma, addone)
             aux = aux_ngram.perplexity(held_out)
             candidates.append((aux, gamma))
-
+        print(candidates)
         self.gamma = min(candidates)[1]
     #    print(self.gamma)
 
@@ -426,7 +428,6 @@ class BackOffNGram(NGram):
         """
         Creates alpha dictionary
         """
-        print('ENTRO ALPHA_DICT')
         alphadict = self.alphadict
         counts = self.counts
         beta = self.beta
@@ -439,7 +440,6 @@ class BackOffNGram(NGram):
         """
         Creates denom dictionary
         """
-        print('ENTRO DENOM_DICT')
         addone = self.addone
         counts = self.counts
         denomdict = self.denomdict

@@ -39,10 +39,13 @@ if __name__ == '__main__':
     sents = sents[-ceil(0.1*len(sents)):]  # Take the last 10%
 
     log_prob = 0.
-    m = 0
-    for sent in sents:
-        log_prob += model.sent_log_prob(sent)
-        m += len(sent)
-    l = log_prob/m
-    perplexity = pow(2, -l)
-    print(perplexity)
+    m = 0.
+    entro = 0.
+    perl = 0.
+    log_prob = model.log_prob(sents)
+    entro = model.cross_entropy(sents)
+    perpl = model.perplexity(sents)
+
+    print("Log probability",log_prob)
+    print("Cross entropy", entro)
+    print("Perplexity", perpl)

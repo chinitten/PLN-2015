@@ -69,33 +69,3 @@ Chequear Estilo de Código
 Correr flake8 sobre el paquete o módulo que se desea chequear. Por ejemplo::
 
     flake8 languagemodeling
-
-RESULTADOS:
-
-EJERCICIO 3 - GENERACIÓN DE TEXTO.
-
-1 ngram -> [',', ',', ',', '.', 'de', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', 'el', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', '.', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', 'la', ',', ',', ',', ',', ',', ',', ',', 'de', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', 'se', ',', ',', 'de', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', 'el', ',', ',', ',', ',', ',', ',', 'que', ',', ',', ',', ',', 'que', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', 'que', ',', ',', ',', ',', ',', 'los', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', 'de', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',', ',']
-2 ngram -> ['El', 'coronel', 'Aureliano', ',', 'y', 'se', 'le', 'dijo', 'el', 'coronel', 'Aureliano', 'Buendía', ',', 'en', 'el', 'coronel', 'no', 'se', 'le', 'dijo', '.', 'Y', 'el', 'coronel', 'Aureliano', 'Buendía', '.']
-3 ngram -> ['El', 'coronel', 'no', 'supo', 'qué', 'contestar', ',', 'pero', 'no', 'se', 'le', 'ocurrió', 'que', 'tal', 'cosa', 'si', 'de', 'algo', 'que', 'ver', 'todas', 'estas', 'cosas', ',', 'y', 'se', 'fue', 'para', 'él', ',', 'y', 'se', 'fue', 'a', 'la', 'casa', ',', 'y', 'se', 'fue', 'a', 'la', 'casa', ',', 'y', 'se', 'dio', 'tiempo', 'de', 'la', 'casa', ',', 'y', 'se', 'fue', 'a', 'la', 'casa', ',', 'y', 'se', 'fue', 'a', 'la', 'casa', ',', 'y', 'se', 'fue', 'a', 'la', 'casa', ',', 'y', 'se', 'fue', 'a', 'la', 'casa', ',', 'y', 'se', 'fue', 'a', 'la', 'casa', ',', 'y', 'se', 'fue', 'a', 'la', 'casa', 'de', 'la', 'casa', ',', 'y', 'se', 'fue', 'a', 'la', 'casa', ',', 'y', 'se', 'fue', 'a', 'la', 'casa', ',', 'y', 'se', 'fue', 'a', 'la', 'casa', ',', 'y', 'se', 'fue', 'a', 'la', 'casa', ',', 'salvo', 'el', 'reloj', 'de', 'péndulo', 'resonaron', 'en', 'el', 'cuarto', 'de', 'Melquíades', ',', 'en', 'el', 'cuarto', 'de', 'Melquíades', ',', 'y', 'se', 'fue', 'de', 'vacaciones', 'en', 'la', 'casa', ',', 'y', 'se', 'fue', 'a', 'la', 'casa', ',', 'y', 'se', 'fue', ',', 'y', 'se', 'fue', 'a', 'vivir', 'con', 'Meme', '.', 'En', 'el', 'curso', '1949', '.', 'Atribulado', ',', 'recordando', 'el', 'pienso', 'luego', 'existo', '.']
-4 ngram -> ['El', 'coronel', 'Aureliano', 'Buendía', ',', 'todavía', 'marcados', 'con', 'la', 'cruz', 'de', 'ceniza', 'en', 'la', 'frente', ',', 'y', 'se', 'fue', 'a', 'visitar', 'al', 'doctor', 'Alirio', 'Noguera', 'para', 'que', 'le', 'devolviera', 'a', 'su', 'esposa', '.']
-
-EJERCICIO 5 - PERPLEXITY (ADDONE)
-
-1 ngram addone -> 1417.2548130685464
-2 ngram addone -> 4871.197478051322
-3 ngram addone -> 31715.79791493256
-4 ngram addone -> 49991.42812360582
-
-EJERCICIO 6 - PREPLEXITY (INTERPOLATED)
-
-1 ngram interpolated -> 1417.2548130685464
-2 ngram interpolated -> inf
-3 ngram interpolated -> inf
-4 ngram interpolated -> inf
-
-EJERCICIO 7 - PREPLEXITY (BACKOFF)
-
-1 ngram backoff -> inf
-2 ngram backoff -> inf
-3 ngram backoff -> inf
-4 ngram backoff -> inf

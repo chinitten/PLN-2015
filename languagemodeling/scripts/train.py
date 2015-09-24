@@ -11,7 +11,7 @@ Options:
                   addone: N-grams with add-one smoothing.
                   interpol: Interpolated
                   backoff: Back-Off
-  --addone      Set addone for interpolated ngram [default: False]
+  --addone      Set addone for interpolated ngram
   -g <g>        Set gamma for interpolated ngram.
   -b <b>        Set beta for Back-Off ngram.
   -o <file>     Output model file.
@@ -51,7 +51,7 @@ if __name__ == '__main__':
     a = opts['--addone']
     g = opts['-g']
     b = opts['-b']
-
+    
     if m == 'addone':
         model = AddOneNGram(n, sents)
     elif m == 'ngram':
@@ -59,11 +59,17 @@ if __name__ == '__main__':
     elif m == 'interpol':
         if g is not None:
             g = float(g)
-        model = InterpolatedNGram(n, sents, a, g)
+        if not a:
+            model = InterpolatedNGram(n, sents, g, False)
+        else:
+            model = InterpolatedNGram(n, sents, g, True)
     elif m == 'backoff':
         if b is not None:
             b = float(b)
-        model = BackOffNGram(n, sents, b, a)
+        if not a:
+            model = BackOffNGram(n, sents, b, False)
+        else:
+            model = BackOffNGram(n, sents, b, True)
 
     # save it
     filename = opts['-o']
