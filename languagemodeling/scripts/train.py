@@ -1,7 +1,7 @@
 """Train an n-gram model.
 
 Usage:
-  train.py -n <n> [-m <model>] [--addone] [--gamma <g>] [--beta <b>] -o <file>
+  train.py -n <n> [-m <model>] [--addone] [-g <g>] [-b <b>] -o <file>
   train.py -h | --help
 
 Options:
@@ -12,8 +12,8 @@ Options:
                   interpol: Interpolated
                   backoff: Back-Off
   --addone      Set addone for interpolated ngram [default: False]
-  --gamma <g>   Set gamma for interpolated ngram [default: None]
-  --beta <b>    Set beta for Back-Off ngram [default: None]
+  -g <g>        Set gamma for interpolated ngram.
+  -b <b>        Set beta for Back-Off ngram.
   -o <file>     Output model file.
   -h --help     Show this screen.
 """
@@ -49,8 +49,8 @@ if __name__ == '__main__':
     n = int(opts['-n'])
     m = opts['-m']
     a = opts['--addone']
-    g = opts['--gamma']
-    b = opts['--beta']
+    g = opts['-g']
+    b = opts['-b']
 
     if m == 'addone':
         model = AddOneNGram(n, sents)
