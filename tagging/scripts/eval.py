@@ -13,7 +13,7 @@ import pickle
 import sys
 
 from corpus.ancora import SimpleAncoraCorpusReader
-
+from collections import defaultdict
 
 def progress(msg, width=None):
     """Ouput the progress of something on the same line."""
@@ -38,8 +38,10 @@ if __name__ == '__main__':
     sents = corpus.tagged_sents()
 
     # tag
-    hits, total = 0, 0
+    hits, total, unknown, unk_hits = 0., 0., 0., 0.
     n = len(sents)
+    matrix = defaultdict(lambda: defaultdict(float))
+    matrixcount = defaultdict(float)
     for i, sent in enumerate(sents):
         word_sent, gold_tag_sent = zip(*sent)
 
@@ -52,9 +54,36 @@ if __name__ == '__main__':
         total += len(sent)
         acc = float(hits) / total
 
+        tagmiss = list(zip(word_sent,gold_tag_sent,model_tag_sent))
+
+
+        for word, gold_tag, tag in tagmiss:
+            # check if unknown
+             if model.unknown(word):
+                 unknown += 1.
+                 # when unknown check if tag hit happens
+                 if gold_tag == tag:
+                     unk_hits += 1.
+                 else:
+                     matrix[gold_tag][tag] += 1.
+                     matrixcount[gold_tag] += 1.
+
+
         progress('{:3.1f}% ({:2.2f}%)'.format(float(i) * 100 / n, acc * 100))
 
-    acc = float(hits) / total
+    for tag, dic in matrix.items():
+        for tg, num in matrix[tag].items():
+            matrix[tag][tg] = matrix[tag][tg]/matrixcount[tag]
 
+    acc = float(hits) / total
+    unk_acc = unk_hits / unknown
+    diff_acc = (hits - unk_hits) / (total - unknown)
+    print('')
+    print("Confusion Matrix")
+    print(matrix)
+    print('')
+    print('Unknown Accuracy: {:2.2f}%'.format(unk_acc * 100))
+    print('')
+    print('Known Accuracy: {:2.2f}%'.format(diff_acc * 100))
     print('')
     print('Accuracy: {:2.2f}%'.format(acc * 100))
