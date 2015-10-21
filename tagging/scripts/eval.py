@@ -35,7 +35,7 @@ if __name__ == '__main__':
     # load the data
     files = '3LB-CAST/.*\.tbf\.xml'
     corpus = SimpleAncoraCorpusReader('ancora/ancora-2.0/', files)
-    sents = corpus.tagged_sents()
+    sents = list(corpus.tagged_sents())
 
     # tag
     hits, total, unknown, unk_hits = 0., 0., 0., 0.

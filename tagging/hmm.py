@@ -11,14 +11,14 @@ class HMM:
         """
 
         self.n = n
-        self.tagset = tagset
+        self._tagset = tagset
         self.trans = trans
         self.out = out
 
     def tagset(self):
         """Returns the set of tags.
         """
-        return self.tagset
+        return self._tagset
 
     def trans_prob(self, tag, prev_tags):
         """Probability of a tag.
