@@ -125,3 +125,33 @@ class ViterbiTagger:
 
         sent -- the sentence.
         """
+        m = len(sent)
+        hmm = self.hmm
+        n = self.hmm.n
+        tagset = self.hmm.tagset()
+        self._pi = pi = {}
+        pi[0] = {('<s>',) * (n - 1): (0., [])}
+
+        for k , wordtag in zip(range(1, m+1),sent):
+            pi[k] = {}
+            for tag_ant ,(pi_ant, list_tags) in pi[k-1].items():
+                for v in tagset:
+                    q = hmm.trans_prob(v,tag_ant)
+                    e = hmm.out_prob(sent[k-1],v)
+                    if (e!=0. and q!=0.):
+                        new_prev = (tag_ant + (v,))[1:]
+                        pi_new = pi_ant + log2(q) + log2(e)
+                        if new_prev not in pi[k] or pi[k][new_prev] < pi_new:
+                            pi[k][new_prev] = (pi_new, list_tags + [v])
+
+        max_lp = float('-inf')
+        result = None
+        for tag_ant, (pi_ant, list_tags) in pi[m].items():
+            q = hmm.trans_prob('</s>', tag_ant)
+            if q > 0.:
+                new_pi = pi_ant + log2(q)
+                if new_pi > max_lp:
+                    max_lp = new_pi
+                    result = list_tags
+
+        return result
