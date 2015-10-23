@@ -73,7 +73,7 @@ class HMM:
         sent_tag = zip(x,y)
         for item in sent_tag:
             result *= self.out_prob(item[0],item[1])
-        return result
+        return result * self.tag_prob(y)
 
     def tag_log_prob(self, y):
         """
@@ -102,7 +102,7 @@ class HMM:
         sent_tag = zip(x,y)
         for item in sent_tag:
             result += log2(self.out_prob(item[0],item[1]))
-        return result
+        return result + self.tag_log_prob(y)
 
     def tag(self, sent):
         """Returns the most probable tagging for a sentence.
@@ -144,14 +144,60 @@ class ViterbiTagger:
                         if new_prev not in pi[k] or pi[k][new_prev] < pi_new:
                             pi[k][new_prev] = (pi_new, list_tags + [v])
 
-        max_lp = float('-inf')
+        max_pi = float('-inf')
         result = None
         for tag_ant, (pi_ant, list_tags) in pi[m].items():
             q = hmm.trans_prob('</s>', tag_ant)
             if q > 0.:
                 new_pi = pi_ant + log2(q)
-                if new_pi > max_lp:
-                    max_lp = new_pi
+                if new_pi > max_pi:
+                    max_pi = new_pi
                     result = list_tags
 
         return result
+
+
+class MLHMM(HMM):
+
+    def __init__(self, n, tagged_sents, addone=True):
+        """
+        n -- order of the model.
+        tagged_sents -- training sentences, each one being a list of pairs.
+        addone -- whether to use addone smoothing (default: True).
+        """
+
+    def tcount(self, tokens):
+        """Count for an n-gram or (n-1)-gram of tags.
+
+        tokens -- the n-gram or (n-1)-gram tuple of tags.
+        """
+
+    def unknown(self, w):
+        """Check if a word is unknown for the model.
+
+        w -- the word.
+        """
+
+    def out_prob(self, word, tag):
+        """Probability of a word given a tag.
+
+        word -- the word.
+        tag -- the tag.
+        """
+        """ si es desconocida devolver 1/v
+
+        cantidad de veces palabra x con el tag s sobre count(tag s)
+
+        """
+
+    def trans_prob(self, tag, prev_tags):
+        """Probability of a tag.
+
+        tag -- the tag.
+        prev_tags -- tuple with the previous n-1 tags (optional only if n = 1).
+        """
+        """checkeak si es addone  devolves con esmoothing sumandole el 1 / v
+
+        count(todo) / count(prev_tags)
+
+        """

@@ -46,7 +46,7 @@ def prev_tags(h):
 
     h -- a history.
     """
-    return h.prev_tags
+    return str(h.prev_tags)
 
 class NPrevTags(Feature):
 
@@ -65,7 +65,7 @@ class NPrevTags(Feature):
         n = self.n
         prev_tags = h.prev_tags
         prev_tags = prev_tags[-n:]
-        return prev_tags
+        return str(prev_tags)
 
 class PrevWord(Feature):
 
