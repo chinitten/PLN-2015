@@ -62,7 +62,7 @@ class TestFeatures(TestCase):
             (History(sent1, ('V', 'N'), 4), ('V', 'N')),
         ]
         for h, v in feature_values:
-            self.assertEqual(prev_tags(h), v)
+            self.assertEqual(prev_tags(h), str(v))
 
     def test_one_prev_tags(self):
         n_prev_tags = NPrevTags(1)
@@ -82,7 +82,7 @@ class TestFeatures(TestCase):
             (History(sent1, ('V', 'N'), 4), ('N',)),
         ]
         for h, v in feature_values:
-            self.assertEqual(n_prev_tags(h), v)
+            self.assertEqual(n_prev_tags(h), str(v))
 
     def test_two_prev_tags(self):
         n_prev_tags = NPrevTags(2)
@@ -102,7 +102,7 @@ class TestFeatures(TestCase):
             (History(sent1, ('V', 'N'), 4), ('V', 'N')),
         ]
         for h, v in feature_values:
-            self.assertEqual(n_prev_tags(h), v)
+            self.assertEqual(n_prev_tags(h), str(v))
 
     def test_word_istitle(self):
         sent0 = 'EL gato come pescado .'.split()

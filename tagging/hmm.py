@@ -1,4 +1,6 @@
 from math import log2
+from collections import defaultdict, Counter
+from itertools import chain
 
 class HMM:
 
@@ -128,7 +130,7 @@ class ViterbiTagger:
         m = len(sent)
         hmm = self.hmm
         n = self.hmm.n
-        tagset = self.hmm.tagset()
+        tagset = hmm.tagset()
         self._pi = pi = {}
         pi[0] = {('<s>',) * (n - 1): (0., [])}
 
@@ -137,7 +139,9 @@ class ViterbiTagger:
             for tag_ant ,(pi_ant, list_tags) in pi[k-1].items():
                 for v in tagset:
                     q = hmm.trans_prob(v,tag_ant)
+                    print(sent[k-1],v)
                     e = hmm.out_prob(sent[k-1],v)
+                    print(e)
                     if (e!=0. and q!=0.):
                         new_prev = (tag_ant + (v,))[1:]
                         pi_new = pi_ant + log2(q) + log2(e)
@@ -165,18 +169,48 @@ class MLHMM(HMM):
         tagged_sents -- training sentences, each one being a list of pairs.
         addone -- whether to use addone smoothing (default: True).
         """
+        self.n = n
+        self.addone = addone
+        self.tagcount = defaultdict(int)
+        self.wordcount = defaultdict(int)
+        wordstags = list(chain.from_iterable(tagged_sents))
+        self.wordtagcount = dict(Counter(wordstags))
+        words , tags = zip(*wordstags)
+        self.wordcount = dict(Counter(words))
+        self._tagset = set(tags)
+
+        # Since tags lack START && STOP symbols, we have to put them manually.
+        for sent in tagged_sents:
+            if sent != []:
+                w, tags = zip(*sent)
+                tags = (n-1)*['<s>'] + list(tags)
+                tags.append('</s>')
+                # Count tags
+                for i in range(len(tags) - n + 1):
+                    ngram = tuple(tags[i: i + n])
+                    self.tagcount[ngram] += 1
+                    self.tagcount[ngram[:-1]] += 1
+
+        self.tagcount = dict(self.tagcount)
+        self.v = len(self.wordcount)
 
     def tcount(self, tokens):
         """Count for an n-gram or (n-1)-gram of tags.
 
         tokens -- the n-gram or (n-1)-gram tuple of tags.
         """
+        return self.tagcount.get(tokens, 0.)
 
     def unknown(self, w):
         """Check if a word is unknown for the model.
 
         w -- the word.
         """
+
+        result = self.wordcount.get(w, True)
+        if result is not True:
+            result = False
+        return result
 
     def out_prob(self, word, tag):
         """Probability of a word given a tag.
@@ -189,6 +223,14 @@ class MLHMM(HMM):
         cantidad de veces palabra x con el tag s sobre count(tag s)
 
         """
+        if self.unknown(word):
+            outprob = 1/self.v
+        else:
+            tagcount = self.tagcount.get((tag,),0.)
+            if tagcount is not 0.:
+                outprob = self.wordtagcount.get((word,tag),0.) / tagcount
+
+        return outprob
 
     def trans_prob(self, tag, prev_tags):
         """Probability of a tag.
@@ -201,3 +243,14 @@ class MLHMM(HMM):
         count(todo) / count(prev_tags)
 
         """
+        transprob = 0.
+        prev_tagcount = self.tagcount.get(prev_tags,0.)
+        tagcount = self.tagcount.get(prev_tags + (tag,),0.)
+
+        if self.addone:
+            result = (tagcount + 1.) / (prev_tagcount + self.v)
+        else:
+            if prev_tagcount is not 0:
+                transprob = tagcount / prev_tagcount
+                
+        return transprob

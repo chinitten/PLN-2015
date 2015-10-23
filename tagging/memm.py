@@ -16,7 +16,14 @@ class MEMM:
         tagged_sents -- list of sentences, each one being a list of pairs.
         """
         self.n = n
- #calcular v y en unkwon fijarse que no este en v
+        
+        words = []
+        for sent in tagged_sents:
+            w , t = zip(*sent)
+            words += list(w)
+
+        self.v = set(words)
+
         features = [word_lower, word_istitle, word_isupper, word_isdigit, prev_tags, NPrevTags(n)]
         prevword = []
         for f in features:
@@ -109,3 +116,8 @@ class MEMM:
 
         w -- the word.
         """
+        result = False
+        if w not in self.v:
+            result = True
+
+        return result
