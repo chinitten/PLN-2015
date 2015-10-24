@@ -16,11 +16,12 @@ class MEMM:
         tagged_sents -- list of sentences, each one being a list of pairs.
         """
         self.n = n
-        
+
         words = []
         for sent in tagged_sents:
-            w , t = zip(*sent)
-            words += list(w)
+            if sent != []:
+                w , t = zip(*sent)
+                words += list(w)
 
         self.v = set(words)
 
@@ -56,12 +57,13 @@ class MEMM:
         tagged_sent -- the tagged sentence (a list of pairs (word, tag)).
         """
         n = self.n
-        words , tags = zip(*tagged_sent)
-        tags = ['<s>']*(n - 1)+ list(tags)
-        upto = len(words)
         result = []
-        for i in range(0, upto):
-            result.append(History(list(words),tuple(tags[i:n-1+i]),i))
+        if tagged_sent != []:
+            words , tags = zip(*tagged_sent)
+            tags = ['<s>']*(n - 1)+ list(tags)
+            upto = len(words)
+            for i in range(0, upto):
+                result.append(History(list(words),tuple(tags[i:n-1+i]),i))
         return result
 
     def sents_tags(self, tagged_sents):

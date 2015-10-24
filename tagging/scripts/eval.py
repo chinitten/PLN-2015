@@ -54,22 +54,21 @@ if __name__ == '__main__':
         total += len(sent)
         acc = float(hits) / total
 
-        tagmiss = list(zip(word_sent,gold_tag_sent,model_tag_sent))
+        tagmiss = zip(word_sent,gold_tag_sent,model_tag_sent)
 
 
         for word, gold_tag, tag in tagmiss:
             # check if unknown
-             if model.unknown(word):
-                 unknown += 1.
-                 # when unknown check if tag hit happens
-                 if gold_tag == tag:
-                     unk_hits += 1.
-                 else:
-                     matrix[gold_tag][tag] += 1.
-                     matrixcount[gold_tag] += 1.
+            if model.unknown(word):
+                unknown += 1.
+                # when unknown check if tag hit happens
+                if gold_tag == tag:
+                    unk_hits += 1.
+                else:
+                    matrix[gold_tag][tag] += 1.
+                    matrixcount[gold_tag] += 1.
 
-
-        progress('{:3.1f}% ({:2.2f}%)'.format(float(i) * 100 / n, acc * 100))
+        progress('Accuracy {:3.1f}% ({:2.2f}%)'.format(float(i) * 100 / n, acc * 100))
 
     for tag, dic in matrix.items():
         for tg, num in matrix[tag].items():
@@ -77,7 +76,8 @@ if __name__ == '__main__':
 
     acc = float(hits) / total
     unk_acc = unk_hits / unknown
-    diff_acc = (hits - unk_hits) / (total - unknown)
+    diff_acc = (float(hits) - unk_hits) / (total - unknown)
+
     print('')
     print("Confusion Matrix")
     print(matrix)

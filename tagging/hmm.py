@@ -139,14 +139,13 @@ class ViterbiTagger:
             for tag_ant ,(pi_ant, list_tags) in pi[k-1].items():
                 for v in tagset:
                     q = hmm.trans_prob(v,tag_ant)
-                    print(sent[k-1],v)
                     e = hmm.out_prob(sent[k-1],v)
-                    print(e)
                     if (e!=0. and q!=0.):
                         new_prev = (tag_ant + (v,))[1:]
                         pi_new = pi_ant + log2(q) + log2(e)
-                        if new_prev not in pi[k] or pi[k][new_prev] < pi_new:
+                        if new_prev not in pi[k] or pi[k][new_prev][0] < pi_new:
                             pi[k][new_prev] = (pi_new, list_tags + [v])
+
 
         max_pi = float('-inf')
         result = None
@@ -177,6 +176,8 @@ class MLHMM(HMM):
         self.wordtagcount = dict(Counter(wordstags))
         words , tags = zip(*wordstags)
         self.wordcount = dict(Counter(words))
+        self.tagcountunigram = dict(Counter(tags))
+        self.tagcountunigram['<s>'] = len(tagged_sents)*(n-1)
         self._tagset = set(tags)
 
         # Since tags lack START && STOP symbols, we have to put them manually.
@@ -218,15 +219,12 @@ class MLHMM(HMM):
         word -- the word.
         tag -- the tag.
         """
-        """ si es desconocida devolver 1/v
 
-        cantidad de veces palabra x con el tag s sobre count(tag s)
-
-        """
+        outprob = 0.
         if self.unknown(word):
             outprob = 1/self.v
         else:
-            tagcount = self.tagcount.get((tag,),0.)
+            tagcount = self.tagcountunigram.get(tag,0.)
             if tagcount is not 0.:
                 outprob = self.wordtagcount.get((word,tag),0.) / tagcount
 
@@ -238,19 +236,13 @@ class MLHMM(HMM):
         tag -- the tag.
         prev_tags -- tuple with the previous n-1 tags (optional only if n = 1).
         """
-        """checkeak si es addone  devolves con esmoothing sumandole el 1 / v
 
-        count(todo) / count(prev_tags)
-
-        """
         transprob = 0.
         prev_tagcount = self.tagcount.get(prev_tags,0.)
         tagcount = self.tagcount.get(prev_tags + (tag,),0.)
-
         if self.addone:
-            result = (tagcount + 1.) / (prev_tagcount + self.v)
+            transprob = (tagcount + 1.) / (prev_tagcount + self.v)
         else:
             if prev_tagcount is not 0:
                 transprob = tagcount / prev_tagcount
-                
         return transprob
