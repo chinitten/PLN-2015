@@ -46,3 +46,26 @@ def spans(t, unary=False):
         result.add(span)
 
     return result
+
+
+def unlabelled_spans(t, unary=False):
+    """Return the list of spans of a tree, each span being a triple (n, i, j),
+    where n is the non-terminal and (i, j) is the sentence interval.
+
+    t -- the tree.
+    unary -- whether to return the unary productions (default: False).
+    """
+    t2 = t.copy(deep=True)
+    for i, p in enumerate(t2.treepositions('leaves')):
+        t2[p] = i
+    result = set()
+
+    def f(t):
+        return (unary or len(t) > 1) and t.height() > 2
+
+    for st in t2.subtrees(filter=f):
+        leaves = st.leaves()
+        span = (leaves[0], leaves[-1])
+        result.add(span)
+
+    return result
