@@ -49,8 +49,8 @@ def spans(t, unary=False):
 
 
 def unlabelled_spans(t, unary=False):
-    """Return the list of spans of a tree, each span being a triple (n, i, j),
-    where n is the non-terminal and (i, j) is the sentence interval.
+    """Return the list of unlabelled spans of a tree, each span being a tuple (i, j),
+    where (i, j) is the sentence interval.
 
     t -- the tree.
     unary -- whether to return the unary productions (default: False).
