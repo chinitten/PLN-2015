@@ -1,4 +1,5 @@
 from nltk.tree import Tree
+from collections import defaultdict
 
 class CKYParser:
 
@@ -8,7 +9,7 @@ class CKYParser:
         """
         self.grammar = grammar
 
-        self.nonterminals = nonterminals = []
+        self.nonterminals = nonterminals = defaultdict(list)
         self.terminals = terminals = []
         self.start = grammar.start()
 
@@ -16,9 +17,12 @@ class CKYParser:
 
         for g in productions:
             if len(g.rhs())> 1:
-                nonterminals += [g]
-            elif len(g.rhs()) == 1:
+                y = g.rhs()[0].symbol()
+                z = g.rhs()[1].symbol()
+                nonterminals[(y,z)] += [(g.lhs(),g.logprob())]
+            elif g.is_lexical():
                 terminals += [g]
+        self.nonterminals = dict(nonterminals)
         self._pi = dict()
         self._bp = dict()
 
@@ -48,15 +52,16 @@ class CKYParser:
                 j = i + l
                 pi[(i,j)] = dict()
                 bp[(i,j)] = dict()
-                for nt in nonterminals:
-                    for s in range(i,j):
-                        if pi[(i,s)].get(nt.rhs()[0].symbol(), None) is not None:
-                            if pi[(s+1,j)].get(nt.rhs()[1].symbol(), None) is not None:
-                                npi = pi[(i,s)][nt.rhs()[0].symbol()] + pi[(s+1,j)][nt.rhs()[1].symbol()] + nt.logprob()
-                                if pi[(i,j)].get(nt.lhs().symbol(), None) is None or npi > pi[(i,j)][nt.lhs().symbol()]:
-                                            pi[(i,j)][nt.lhs().symbol()] = npi
-                                            bp[(i,j)][nt.lhs().symbol()] = Tree(nt.lhs().symbol(), [bp[(i,s)].get(nt.rhs()[0].symbol(), None),
-                                                                        bp[(s+1,j)].get(nt.rhs()[1].symbol(), None)])
+                for s in range(i,j):
+                    for y in pi[(i,s)].keys():
+                        for z in pi[(s+1,j)].keys():
+                            xs = nonterminals.get((y,z), None)
+                            if xs is not None:
+                                for x in xs:
+                                    npi = pi[(i,s)][y] + pi[(s+1,j)][z] + x[1]
+                                    if pi[(i,j)].get(x[0].symbol(), None) is None or npi > pi[(i,j)][x[0].symbol()]:
+                                        pi[(i,j)][x[0].symbol()] = npi
+                                        bp[(i,j)][x[0].symbol()] = Tree(x[0].symbol(), [bp[(i,s)].get(y, None), bp[(s+1,j)].get(z, None)])
 
         prob = pi[(1,n)].get(start, None)
         tree = bp[(1,n)].get(start, None)

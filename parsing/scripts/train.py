@@ -1,7 +1,7 @@
 """Train a parser.
 
 Usage:
-  train.py [-m <model>] [--hm] -o <file>
+  train.py [-m <model>] [-n <val>] -o <file>
   train.py -h | --help
 
 Options:
@@ -10,7 +10,7 @@ Options:
                   rbranch: Right branching trees
                   lbranch: Left branching trees
                   upcfg: UPCFG
-  --hm           Enables horizontal markovization (For UPCFG).
+  -n <val>      Enables horizontal markovization
   -o <file>     Output model file.
   -h --help     Show this screen.
 """
@@ -38,11 +38,12 @@ if __name__ == '__main__':
     files = 'CESS-CAST-(A|AA|P)/.*\.tbf\.xml'
     corpus = SimpleAncoraCorpusReader('ancora/ancora-2.0/', files)
 
-    horzmarkov = opts['--hm']
+    horzmarkov = opts['-n']
     model = opts['-m']
     print('Training model...')
-    if model == 'upcfg' and horzmarkov:
-        model = models[model](corpus.parsed_sents(), horzMarkov=True)
+    if model == 'upcfg' and horzmarkov is not None:
+        horzmarkov = int(horzmarkov)
+        model = models[model](corpus.parsed_sents(), horzMarkov=horzmarkov)
     else:
         model = models[model](corpus.parsed_sents())
 
