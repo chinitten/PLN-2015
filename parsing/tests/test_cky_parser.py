@@ -10,6 +10,90 @@ from parsing.cky_parser import CKYParser
 
 class TestCKYParser(TestCase):
 
+    def test_ambiguous_sentence(self):
+
+        grammar = PCFG.fromstring(
+                """
+                    S -> Verb NPNP              [0.5]
+                    S -> Verb NP                [0.5]
+                    NP -> Det Noun              [0.5]
+                    NP -> Det NounNoun          [0.5]
+                    NounNoun -> Noun Noun       [1.0]
+                    NPNP -> NP Noun             [1.0]
+                    Noun -> 'flights'           [0.5]
+                    Verb -> 'book'              [1.0]
+                    Det -> 'the'                [1.0]
+                    Noun -> 'dinner'            [0.5]
+                """)
+
+        parser = CKYParser(grammar)
+
+        sent = "book the dinner flights".split()
+
+        prob, tree = parser.parse(sent)
+
+        t2 = Tree.fromstring(
+            """
+                (S
+                    (Verb book)
+                    (NP
+                        (Det the)
+                        (NounNoun
+                            (Noun dinner)
+                            (Noun flights)
+                        )
+                    )
+
+                )    """)
+        # checks tree
+        self.assertEqual(tree, t2)
+
+        probt = log2(0.5*0.5*1.0*0.5*1.0*1.0*0.5)
+        # checks lprob
+        self.assertEqual(prob, probt)
+
+        pi = {
+            (1, 1): {'Verb': log2(1.0)},
+            (2, 2): {'Det': log2(1.0)},
+            (3, 3): {'Noun': log2(0.5)},
+            (4, 4): {'Noun': log2(0.5)},
+
+            (1, 2): {},
+            (1, 3): {'S': log2(1.0*0.5*0.5*1.0*0.5)},
+            (1, 4): {'S': log2(0.5*0.5*1.0*0.5*1.0*1.0*0.5)},
+
+            (2, 3): {'NP': log2(1.0*0.5*1.0*0.5)},
+
+            # Both trees with equal probability
+            (2, 4): {'NP': log2(1.0*0.5*0.5*1.0*0.5), 'NPNP': log2(1.0*0.5*0.5*1.0*0.5)},
+
+            (3, 4): {'NounNoun': log2(0.5*0.5*1.0)},
+
+            }
+
+        # checks pi
+        self.assertEqual(parser._pi, pi)
+
+        bp = {
+            (1, 1): {'Verb': Tree.fromstring("(Verb book)")},
+            (2, 2): {'Det': Tree.fromstring("(Det the)")},
+            (3, 3): {'Noun': Tree.fromstring("(Noun dinner)")},
+            (4, 4): {'Noun': Tree.fromstring("(Noun flights)")},
+
+            (1, 2): {},
+            (1, 3): {'S': Tree.fromstring("(S (Verb book) (NP (Det the) (Noun dinner)))")},
+            (1, 4): {'S': Tree.fromstring("(S (Verb book) (NP (Det the) (NounNoun (Noun dinner) (Noun flights))))")},
+
+            (2, 3): {'NP': Tree.fromstring("(NP (Det the) (Noun dinner))")},
+
+            # Both trees with equal probability
+            (2, 4): {'NP': Tree.fromstring("(NP (Det the) (NounNoun (Noun dinner) (Noun flights)))"), 'NPNP': Tree.fromstring("(NPNP (NP (Det the) (Noun dinner)) (Noun flights))")},
+
+            (3, 4): {'NounNoun': Tree.fromstring("(NounNoun (Noun dinner) (Noun flights))")},
+
+        }
+        self.assertEqual(parser._bp, bp)
+
     def test_parse(self):
         grammar = PCFG.fromstring(
             """

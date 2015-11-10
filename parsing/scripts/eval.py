@@ -16,7 +16,7 @@ import sys
 
 from corpus.ancora import SimpleAncoraCorpusReader
 
-from parsing.util import spans , unlabelled_spans
+from parsing.util import spans, unlabelled_spans
 
 
 def progress(msg, width=None):
@@ -61,7 +61,7 @@ if __name__ == '__main__':
         N = n
 
     format_str = '{} {:3.1f}% ({}/{}) (P={:2.2f}%, R={:2.2f}%, F1={:2.2f}%)'
-    progress(format_str.format('Labelled',0.0, 0, N, 0.0, 0.0, 0.0) + format_str.format(' Unlabelled',0.0, 0, N, 0.0, 0.0, 0.0))
+    progress(format_str.format('Labelled', 0.0, 0, N, 0.0, 0.0, 0.0) + format_str.format(' Unlabelled', 0.0, 0, N, 0.0, 0.0, 0.0))
 
     for i, gold_parsed_sent in enumerate(parsed_sents):
         tagged_sent = gold_parsed_sent.pos()
@@ -98,8 +98,8 @@ if __name__ == '__main__':
             u_rec = float(unlabelled_hits) / total_unlabelled_gold * 100
             u_f1 = 2 * u_prec * u_rec / (u_prec + u_rec)
 
-            progress(format_str.format("Labelled",float(i+1) * 100 / N, i+1, N, prec, rec, f1) +
-                format_str.format(" Unlabelled",float(i+1) * 100 / N, i+1, N, u_prec, u_rec, u_f1))
+            progress(format_str.format("Labelled", float(i+1) * 100 / N, i+1, N, prec, rec, f1) +
+                        format_str.format(" Unlabelled", float(i+1) * 100 / N, i+1, N, u_prec, u_rec, u_f1))
             counter += 1
 
             if counter == n:

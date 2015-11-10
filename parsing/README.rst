@@ -52,6 +52,15 @@ Ejercicio 1:
       user	0m6.520s
       sys	0m0.064s
 
+Ejercicio 2:
+-----------
+
+    En el desarrollo del test de ambiguedad, se utilizó una oración con dos árboles sintácticos.
+    "book the dinner flights"
+    Luego de llevar ambos árboles a la forma normal de chomsky, se llegó a la conclusión de que tenían la misma probabilidad.
+    Lo que ocasiona que el test se ejecute correctamente o falle en forma aleatoria.
+    Esto se podría solucionar sorteando entre alguno de los dos árboles.
+    También se podría utilizar una forma normal de chomsky flexible sobre los árboles, siempre y cuando haya soporte para producciones unarias.
 
 Ejercicio 3:
 -----------

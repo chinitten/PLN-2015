@@ -3,6 +3,7 @@ from nltk.tree import Tree
 from parsing.cky_parser import CKYParser
 from parsing.util import unlexicalize, lexicalize
 
+
 class UPCFG:
     """Unlexicalized PCFG.
     """
