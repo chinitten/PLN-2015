@@ -45,6 +45,19 @@ n	words	%	examples
 
 6	3	0.01%	[('una', 3852), ('como', 1736), ('uno', 335)]
 
+Descripción de etiquetas.
+
+nc: Nombre común.
+sp: Preposición.
+da: Artículo.
+vm: Verbo principal.
+aq: Adjetivo calificativo.
+fc: Coma.
+np: Nombre propio.
+fp: Punto.
+rg: Adverbio General.
+cc: Conjunción Coordinada.
+
 
 Ejercicio 3 - Entrenamiento y Evaluación de Taggers
 ---------------------------------------------------
@@ -173,3 +186,95 @@ Time::
 real	1m21.729s
 user	1m21.648s
 sys	0m0.112s
+
+LinearSVC::
+
+n:: 1
+
+Accuracy:: 94.43%
+
+Known Accuracy:: 97.04%
+
+Unknown Accuracy:: 70.82%
+
+real	0m24.858s
+user	0m24.740s
+sys	0m0.116s
+
+n:: 2
+
+Accuracy:: 91.55%
+
+Known Accuracy:: 95.62%
+
+Unknown Accuracy:: 54.62%
+
+real	0m49.402s
+user	0m48.856s
+sys	0m0.104s
+
+n:: 3
+
+Accuracy:: 92.11%
+
+Known Accuracy:: 95.82%
+
+Unknown Accuracy:: 58.47%
+
+real	1m10.607s
+user	1m10.044s
+sys	0m0.108s
+
+n:: 4
+
+Accuracy:: 92.94%
+
+Known Accuracy:: 96.09%
+
+Unknown Accuracy:: 64.38%
+
+real	1m20.871s
+user	1m20.792s
+sys	0m0.108s
+
+MultinomialNB::
+
+n:: 1
+
+Accuracy:: 78.84%
+
+Known Accuracy:: 82.12%
+
+Unknown Accuracy:: 49.09%
+
+real	15m38.776s
+user	15m39.104s
+sys	0m0.180s
+
+n:: 2
+
+Accuracy:: 84.36%
+
+Known Accuracy:: 87.95%
+
+Unknown Accuracy:: 51.87%
+
+real	16m29.793s
+user	16m30.160s
+sys	0m0.168s
+
+n:: 3
+
+Accuracy::
+
+Known Accuracy::
+
+Unknown Accuracy::
+
+n:: 4
+
+Accuracy::
+
+Known Accuracy::
+
+Unknown Accuracy::

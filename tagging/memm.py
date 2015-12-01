@@ -8,6 +8,7 @@ from sklearn.svm import LinearSVC
 
 from sklearn.pipeline import Pipeline
 
+
 class MEMM:
 
     def __init__(self, n, tagged_sents):
@@ -20,7 +21,7 @@ class MEMM:
         words = []
         for sent in tagged_sents:
             if sent != []:
-                w , t = zip(*sent)
+                w, t = zip(*sent)
                 words += list(w)
 
         self.v = set(words)
@@ -28,11 +29,11 @@ class MEMM:
         features = [word_lower, word_istitle, word_isupper, word_isdigit, prev_tags, NPrevTags(n)]
         prevword = []
         for f in features:
-             prevword += [PrevWord(f)]
+            prevword += [PrevWord(f)]
         features += prevword
         vectorizer = Vectorizer(features)
         self.pipeline = Pipeline([('vect', vectorizer),
-                            ('classifier', LogisticRegression())])
+                            ('classifier', MultinomialNB())])
         histories = self.sents_histories(tagged_sents)
         tags = self.sents_tags(tagged_sents)
         self.pipeline.fit(histories, tags)
@@ -49,7 +50,6 @@ class MEMM:
 
         return histories
 
-
     def sent_histories(self, tagged_sent):
         """
         Iterator over the histories of a tagged sentence.
@@ -59,11 +59,11 @@ class MEMM:
         n = self.n
         result = []
         if tagged_sent != []:
-            words , tags = zip(*tagged_sent)
-            tags = ['<s>']*(n - 1)+ list(tags)
+            words, tags = zip(*tagged_sent)
+            tags = ['<s>']*(n - 1) + list(tags)
             upto = len(words)
             for i in range(0, upto):
-                result.append(History(list(words),tuple(tags[i:n-1+i]),i))
+                result.append(History(list(words), tuple(tags[i:n-1+i]), i))
         return result
 
     def sents_tags(self, tagged_sents):
@@ -86,7 +86,7 @@ class MEMM:
         """
         tags = []
         if tagged_sent != []:
-            words , tags = zip(*tagged_sent)
+            words, tags = zip(*tagged_sent)
         return list(tags)
 
     def tag(self, sent):
@@ -96,7 +96,7 @@ class MEMM:
         """
         n = self.n
         result = []
-        history = History(sent,('<s>',)*(n-1),0)
+        history = History(sent, ('<s>',)*(n-1), 0)
         prev_tag = ('<s>',)*(n-1)
         for i in range(1, len(sent)+1):
             tag = self.tag_history(history)

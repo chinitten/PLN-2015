@@ -2,6 +2,7 @@ from math import log2
 from collections import defaultdict, Counter
 from itertools import chain
 
+
 class HMM:
 
     def __init__(self, n, tagset, trans, out):
@@ -30,7 +31,7 @@ class HMM:
         """
         result = self.trans.get(prev_tags, 0.)
         if result is not 0.:
-            result = result.get(tag,0.)
+            result = result.get(tag, 0.)
 
         return result
 
@@ -40,9 +41,9 @@ class HMM:
         word -- the word.
         tag -- the tag.
         """
-        result = self.out.get(tag,0.)
+        result = self.out.get(tag, 0.)
         if result is not 0.:
-            result = result.get(word,0.)
+            result = result.get(word, 0.)
 
         return result
 
@@ -58,8 +59,8 @@ class HMM:
         n = self.n
         y = (n-1)*['<s>'] + y + ['</s>']
         upto = len(y)
-        for i in range(n-1,upto):
-            result *= self.trans_prob(y[i],tuple(y[i-n+1:i]))
+        for i in range(n-1, upto):
+            result *= self.trans_prob(y[i], tuple(y[i-n+1:i]))
 
         return result
 
@@ -72,9 +73,9 @@ class HMM:
         y -- tagging.
         """
         result = 1.
-        sent_tag = zip(x,y)
+        sent_tag = zip(x, y)
         for item in sent_tag:
-            result *= self.out_prob(item[0],item[1])
+            result *= self.out_prob(item[0], item[1])
         return result * self.tag_prob(y)
 
     def tag_log_prob(self, y):
@@ -87,11 +88,10 @@ class HMM:
         n = self.n
         y = (n-1)*['<s>'] + y + ['</s>']
         upto = len(y)
-        for i in range(n-1,upto):
-            result += log2(self.trans_prob(y[i],tuple(y[i-n+1:i])))
+        for i in range(n-1, upto):
+            result += log2(self.trans_prob(y[i], tuple(y[i-n+1:i])))
 
         return result
-
 
     def log_prob(self, x, y):
         """
@@ -101,9 +101,9 @@ class HMM:
         y -- tagging.
     """
         result = 0.
-        sent_tag = zip(x,y)
+        sent_tag = zip(x, y)
         for item in sent_tag:
-            result += log2(self.out_prob(item[0],item[1]))
+            result += log2(self.out_prob(item[0], item[1]))
         return result + self.tag_log_prob(y)
 
     def tag(self, sent):
@@ -113,6 +113,7 @@ class HMM:
         """
         tagger = ViterbiTagger(self)
         return tagger.tag(sent)
+
 
 class ViterbiTagger:
 
@@ -134,18 +135,17 @@ class ViterbiTagger:
         self._pi = pi = {}
         pi[0] = {('<s>',) * (n - 1): (0., [])}
 
-        for k , wordtag in zip(range(1, m+1),sent):
+        for k, wordtag in zip(range(1, m+1), sent):
             pi[k] = {}
-            for tag_ant ,(pi_ant, list_tags) in pi[k-1].items():
+            for tag_ant, (pi_ant, list_tags) in pi[k-1].items():
                 for v in tagset:
-                    q = hmm.trans_prob(v,tag_ant)
-                    e = hmm.out_prob(sent[k-1],v)
-                    if (e!=0. and q!=0.):
+                    q = hmm.trans_prob(v, tag_ant)
+                    e = hmm.out_prob(sent[k-1], v)
+                    if (e != 0. and q != 0.):
                         new_prev = (tag_ant + (v,))[1:]
                         pi_new = pi_ant + log2(q) + log2(e)
                         if new_prev not in pi[k] or pi[k][new_prev][0] < pi_new:
                             pi[k][new_prev] = (pi_new, list_tags + [v])
-
 
         max_pi = float('-inf')
         result = None
@@ -174,7 +174,7 @@ class MLHMM(HMM):
         self.wordcount = defaultdict(int)
         wordstags = list(chain.from_iterable(tagged_sents))
         self.wordtagcount = dict(Counter(wordstags))
-        words , tags = zip(*wordstags)
+        words, tags = zip(*wordstags)
         self.wordcount = dict(Counter(words))
         self.tagcountunigram = dict(Counter(tags))
         self.tagcountunigram['<s>'] = len(tagged_sents)*(n-1)
@@ -224,9 +224,9 @@ class MLHMM(HMM):
         if self.unknown(word):
             outprob = 1/self.v
         else:
-            tagcount = self.tagcountunigram.get(tag,0.)
+            tagcount = self.tagcountunigram.get(tag, 0.)
             if tagcount is not 0.:
-                outprob = self.wordtagcount.get((word,tag),0.) / tagcount
+                outprob = self.wordtagcount.get((word, tag), 0.) / tagcount
 
         return outprob
 
@@ -238,10 +238,10 @@ class MLHMM(HMM):
         """
 
         transprob = 0.
-        prev_tagcount = self.tagcount.get(prev_tags,0.)
-        tagcount = self.tagcount.get(prev_tags + (tag,),0.)
+        prev_tagcount = self.tagcount.get(prev_tags, 0.)
+        tagcount = self.tagcount.get(prev_tags + (tag,), 0.)
         if self.addone:
-            transprob = (tagcount + 1.) / (prev_tagcount + self.v)
+            transprob = (tagcount + 1.) / (prev_tagcount + len(self._tagset))
         else:
             if prev_tagcount is not 0:
                 transprob = tagcount / prev_tagcount

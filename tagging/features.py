@@ -17,6 +17,7 @@ def word_lower(h):
     sent, i = h.sent, h.i
     return sent[i].lower()
 
+
 def word_istitle(h):
     """Feature: is the current word titlecased?
 
@@ -24,6 +25,7 @@ def word_istitle(h):
     """
     sent, i = h.sent, h.i
     return sent[i].istitle()
+
 
 def word_isupper(h):
     """Feature: is the current word uppercased?
@@ -33,6 +35,7 @@ def word_isupper(h):
     sent, i = h.sent, h.i
     return sent[i].isupper()
 
+
 def word_isdigit(h):
     """Feature: is the current word a digit?
 
@@ -41,12 +44,14 @@ def word_isdigit(h):
     sent, i = h.sent, h.i
     return sent[i].isdigit()
 
+
 def prev_tags(h):
     """Feature: returns the previos tags
 
     h -- a history.
     """
     return str(h.prev_tags)
+
 
 class NPrevTags(Feature):
 
@@ -67,6 +72,7 @@ class NPrevTags(Feature):
         prev_tags = prev_tags[-n:]
         return str(prev_tags)
 
+
 class PrevWord(Feature):
 
     def __init__(self, f):
@@ -84,5 +90,5 @@ class PrevWord(Feature):
         if h.i == 0:
             return 'BOS'
         else:
-            history = History(h.sent,h.prev_tags,h.i-1)
+            history = History(h.sent, h.prev_tags, h.i-1)
         return str(self.feature(history))

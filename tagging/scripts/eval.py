@@ -15,6 +15,7 @@ import sys
 from corpus.ancora import SimpleAncoraCorpusReader
 from collections import defaultdict
 
+
 def progress(msg, width=None):
     """Ouput the progress of something on the same line."""
     if not width:
@@ -54,8 +55,7 @@ if __name__ == '__main__':
         total += len(sent)
         acc = float(hits) / total
 
-        tagmiss = zip(word_sent,gold_tag_sent,model_tag_sent)
-
+        tagmiss = zip(word_sent, gold_tag_sent, model_tag_sent)
 
         for word, gold_tag, tag in tagmiss:
             # check if unknown
@@ -64,9 +64,9 @@ if __name__ == '__main__':
                 # when unknown check if tag hit happens
                 if gold_tag == tag:
                     unk_hits += 1.
-                else:
-                    matrix[gold_tag][tag] += 1.
-                    matrixcount[gold_tag] += 1.
+            #    else:
+            #        matrix[gold_tag][tag] += 1.
+            #        matrixcount[gold_tag] += 1.
 
         progress('Accuracy {:3.1f}% ({:2.2f}%)'.format(float(i) * 100 / n, acc * 100))
 
