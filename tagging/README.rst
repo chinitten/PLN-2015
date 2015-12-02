@@ -79,16 +79,16 @@ Ejercicio 5 - HMM POS Tagger
 
 n:: 1
 
-Accuracy:: 89.01%
+Accuracy:: 89.03%
 
-Known Accuracy:: 95.32%
+Known Accuracy:: 95.34%
 
 Unknown Accuracy:: 31.80%
 
 Time::
-real	0m8.622s
-user	0m8.556s
-sys	0m0.060s
+real	0m10.663s
+user	0m9.892s
+sys	0m0.076s
 
 n:: 2
 
