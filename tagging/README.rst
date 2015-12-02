@@ -265,16 +265,24 @@ sys	0m0.168s
 
 n:: 3
 
-Accuracy::
+Accuracy:: 84.17%
 
-Known Accuracy::
+Known Accuracy:: 87.74%
 
-Unknown Accuracy::
+Unknown Accuracy:: 51.79%
+
+real	18m32.846s
+user	18m33.216s
+sys	0m0.192s
 
 n:: 4
 
-Accuracy::
+Accuracy:: 82.63%
 
-Known Accuracy::
+Known Accuracy:: 86.14%
 
-Unknown Accuracy::
+Unknown Accuracy:: 50.80%
+
+real	38m45.800s
+user	23m49.056s
+sys	14m57.916s
