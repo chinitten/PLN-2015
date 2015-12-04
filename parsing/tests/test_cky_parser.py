@@ -14,8 +14,8 @@ class TestCKYParser(TestCase):
 
         grammar = PCFG.fromstring(
                 """
-                    S -> Verb NPNP              [0.5]
-                    S -> Verb NP                [0.5]
+                    S -> Verb NPNP              [0.4]
+                    S -> Verb NP                [0.6]
                     NP -> Det Noun              [0.5]
                     NP -> Det NounNoun          [0.5]
                     NounNoun -> Noun Noun       [1.0]
@@ -48,7 +48,7 @@ class TestCKYParser(TestCase):
         # checks tree
         self.assertEqual(tree, t2)
 
-        probt = log2(0.5*0.5*1.0*0.5*1.0*1.0*0.5)
+        probt = log2(0.6*0.5*1.0*0.5*1.0*1.0*0.5)
         # checks lprob
         self.assertEqual(prob, probt)
 
@@ -59,8 +59,8 @@ class TestCKYParser(TestCase):
             (4, 4): {'Noun': log2(0.5)},
 
             (1, 2): {},
-            (1, 3): {'S': log2(1.0*0.5*0.5*1.0*0.5)},
-            (1, 4): {'S': log2(0.5*0.5*1.0*0.5*1.0*1.0*0.5)},
+            (1, 3): {'S': log2(1.0*0.6*0.5*1.0*0.5)},
+            (1, 4): {'S': log2(0.6*0.5*1.0*0.5*1.0*1.0*0.5)},
 
             (2, 3): {'NP': log2(1.0*0.5*1.0*0.5)},
 
